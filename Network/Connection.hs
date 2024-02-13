@@ -106,6 +106,9 @@ connectionSessionManager mvar = TLS.SessionManager
     , TLS.sessionResumeOnlyOnce = \sessionID ->
          modifyMVar mvar (pure . swap . M.updateLookupWithKey (\_ _ -> Nothing) sessionID)
 #endif
+#if MIN_VERSION_tls(2,0,0)
+    , TLS.sessionUseTicket = True
+#endif
     }
 
 -- | Initialize the library with shared parameters between connection.
