@@ -99,8 +99,9 @@ instance E.Exception HostCannotConnect
 connectionSessionManager :: Manager -> TLS.SessionManager
 connectionSessionManager mvar = TLS.SessionManager
     { TLS.sessionResume     = \sessionID -> withMVar mvar (return . M.lookup sessionID)
-    , TLS.sessionEstablish  = \sessionID sessionData ->
-                               modifyMVar_ mvar (return . M.insert sessionID sessionData)
+    , TLS.sessionEstablish  = \sessionID sessionData -> do
+        modifyMVar_ mvar (return . M.insert sessionID sessionData)
+        pure Nothing
     , TLS.sessionInvalidate = \sessionID -> modifyMVar_ mvar (return . M.delete sessionID)
 #if MIN_VERSION_tls(1,5,0)
     , TLS.sessionResumeOnlyOnce = \sessionID ->
